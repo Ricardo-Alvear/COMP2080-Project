@@ -66,79 +66,184 @@ public class Main
 
     }
 
-    public static void TwoPlayer()
-    {
 
+
+    public static void TwoPlayer() {
         System.out.println(GREEN + "Starting the game!\n" + RESET);
-        String winner = "";
-        String p1Symbol;
-        String p2Symbol = "";
-        boolean draw = false;
 
-        System.out.print("Player 1 | Please enter your name: ");
-        String p1 = scanner.nextLine();
+        // Get player names and symbols
+        System.out.print("Player 1 | Enter your name: ");
+        String p1Name = scanner.nextLine();
+        nameCheckTwoPlayerGame(p1Name);
+        System.out.print("Player 1 | Choose your symbol (X or O): ");
+        char p1Symbol = getSymbolInput();
 
-        nameCheckTwoPlayerGame(p1);
+        System.out.print("Player 2 | Enter your name: ");
+        String p2Name = scanner.nextLine();
+        nameCheckTwoPlayerGame(p2Name);
+        char p2Symbol = (p1Symbol == 'X') ? 'O' : 'X';
+        System.out.println("Player 2 | Your symbol is " + p2Symbol);
 
-        System.out.print("Please enter your symbol: ");
-        p1Symbol = scanner.nextLine().toLowerCase();
+        // Create empty board
+        char[][] board = new char[3][3];
+        initBoard(board);
 
-        symbolCheckTwoPlayerGame(p1Symbol, p2Symbol);
+        // Determine who goes first (X always starts)
+        String currentPlayer;
+        char currentSymbol;
+        if (p1Symbol == 'X') {
+            currentPlayer = p1Name;
+            currentSymbol = p1Symbol;
+        } else {
+            currentPlayer = p2Name;
+            currentSymbol = p2Symbol;
+        }
 
-        System.out.print("Player 2 | Please enter your name: ");
-        String p2 = scanner.nextLine();
+        boolean gameOver = false;
+        String winner = null;
 
-        nameCheckTwoPlayerGame(p2);
+        while (!gameOver) {
+            displayBoard(board);
 
-        System.out.print("Please enter your symbol: ");
-        p2Symbol = scanner.nextLine().toLowerCase();
+            System.out.print(currentPlayer + " (" + currentSymbol + "), enter row and column (1‑3, space separated): ");
+            int[] move = getPlayerMove(board);
+            int row = move[0];
+            int col = move[1];
 
-        symbolCheckTwoPlayerGame(p1Symbol, p2Symbol);
+            // Place the symbol
+            board[row][col] = currentSymbol;
 
-        // While the winner is not either player one or player two or a draw has not been reached,
-        // Continue the game
-        while (!Objects.equals(winner, p1) || !Objects.equals(winner, p2) || !Objects.equals(draw, true))
-        {
-
-            // Make an array of integers that has three columns and rows
-            int[][] array = new int[3][3];
-
-            System.out.println("Player 1 | Enter the column and row (comma separated):");
-
-            columnsRowsCheckTwoPlayerGame(winner, draw, p1Symbol, array);
-
-            System.out.println("Player 2 | Enter the column and row (comma separated):");
-
-            columnsRowsCheckTwoPlayerGame(winner, draw, p2Symbol, array);
-
-
-            // Check if the result of the method matches one of the conditions,
-            // If true, break out of the while loop
-            if (columnsRowsCheckTwoPlayerGame(winner, draw, p1Symbol, array).equals("Player 1"))
-            {
-                winner = p1;
-            }else if(columnsRowsCheckTwoPlayerGame(winner, draw, p2Symbol, array).equals("Player 2"))
-            {
-                winner = p2;
-            }else if (columnsRowsCheckTwoPlayerGame(winner, draw, p1Symbol, array).equals("draw") && columnsRowsCheckTwoPlayerGame(winner, draw, p2Symbol, array).equals("draw"))
-            {
-                draw = true;
+            // Check win
+            if (checkWin(board, currentSymbol)) {
+                gameOver = true;
+                winner = currentPlayer;
+            } else if (isDraw(board)) {
+                gameOver = true;
+            } else {
+                // Switch player
+                if (currentPlayer.equals(p1Name)) {
+                    currentPlayer = p2Name;
+                    currentSymbol = p2Symbol;
+                } else {
+                    currentPlayer = p1Name;
+                    currentSymbol = p1Symbol;
+                }
             }
-
         }
 
-        if (!Objects.equals(winner, ""))
-        {
+        displayBoard(board);
+        if (winner != null) {
             System.out.println(GREEN + "CONGRATULATIONS! " + winner + " has won the game!" + RESET);
+        } else {
+            System.out.println(GREEN + "DRAW! " + p1Name + " and " + p2Name + " have tied." + RESET);
         }
-        else if (draw)
-        {
-            System.out.println(GREEN + "DRAW! " + p1 + " and " + p2 + " have tied" + RESET);
-        }
-
-
     }
 
+// -------------------------------------------------------------------------
+// Helper methods for TwoPlayer
+// -------------------------------------------------------------------------
+
+    // Initialize the board with empty spaces
+    private static void initBoard(char[][] board) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                board[i][j] = ' ';
+            }
+        }
+    }
+
+    // Display the board with row and column numbers
+    private static void displayBoard(char[][] board) {
+        System.out.println("\n   1   2   3");
+        for (int i = 0; i < 3; i++) {
+            System.out.print((i + 1) + " ");
+            for (int j = 0; j < 3; j++) {
+                System.out.print(" " + board[i][j] + " ");
+                if (j < 2) System.out.print("|");
+            }
+            System.out.println();
+            if (i < 2) System.out.println("  ---+---+---");
+        }
+        System.out.println();
+    }
+
+    // Get a valid move from the player (returns 0‑based row and column)
+    private static int[] getPlayerMove(char[][] board) {
+        while (true) {
+            try {
+                String input = scanner.nextLine().trim();
+                String[] parts = input.split("\\s+");
+                if (parts.length != 2) {
+                    System.out.print("Please enter two numbers (row and column): ");
+                    continue;
+                }
+                int row = Integer.parseInt(parts[0]) - 1;
+                int col = Integer.parseInt(parts[1]) - 1;
+
+                if (row < 0 || row > 2 || col < 0 || col > 2) {
+                    System.out.print("Row and column must be between 1 and 3. Try again: ");
+                } else if (board[row][col] != ' ') {
+                    System.out.print("That cell is already taken. Choose another: ");
+                } else {
+                    return new int[]{row, col};
+                }
+            } catch (NumberFormatException e) {
+                System.out.print("Invalid input. Please enter numbers (e.g., 1 2): ");
+            }
+        }
+    }
+
+    // Check if the current player has won
+    private static boolean checkWin(char[][] board, char symbol) {
+        // Check rows
+        for (int i = 0; i < 3; i++) {
+            if (board[i][0] == symbol && board[i][1] == symbol && board[i][2] == symbol)
+                return true;
+        }
+        // Check columns
+        for (int j = 0; j < 3; j++) {
+            if (board[0][j] == symbol && board[1][j] == symbol && board[2][j] == symbol)
+                return true;
+        }
+        // Check diagonals
+        if (board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol)
+            return true;
+        if (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol)
+            return true;
+        return false;
+    }
+
+    // Check if the board is full (draw)
+    private static boolean isDraw(char[][] board) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == ' ')
+                    return false;
+            }
+        }
+        // If full and no winner, it's a draw
+        return true;
+    }
+
+    // Helper to get a valid symbol (X or O) from the user
+    private static char getSymbolInput() {
+        while (true) {
+            String input = scanner.nextLine().trim().toUpperCase();
+            if (input.equals("X") || input.equals("O")) {
+                return input.charAt(0);
+            }
+            System.out.print("Invalid symbol. Choose X or O: ");
+        }
+    }
+
+    // Existing name check function (unchanged, but we'll keep it)
+    public static void nameCheckTwoPlayerGame(String name) {
+        while (!name.matches("^[a-zA-Z]+$")) {
+            System.out.println(RED + "\nSorry, invalid input." + RESET);
+            System.out.print("Please enter your name: ");
+            name = scanner.nextLine();
+        }
+    }
     public static String columnsRowsCheckTwoPlayerGame(String winner, boolean draw, String curPlayer, int[][] array)
     {
         while (true)
