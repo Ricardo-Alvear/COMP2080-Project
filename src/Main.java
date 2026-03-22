@@ -67,20 +67,17 @@ public class Main
     }
 
 
-
     public static void TwoPlayer() {
         System.out.println(GREEN + "Starting the game!\n" + RESET);
 
-        // Get player names and symbols
+        // Get player names and symbols using validated methods
         System.out.print("Player 1 | Enter your name: ");
-        String p1Name = scanner.nextLine();
-        nameCheckTwoPlayerGame(p1Name);
+        String p1Name = validateName();
         System.out.print("Player 1 | Choose your symbol (X or O): ");
-        char p1Symbol = getSymbolInput();
+        char p1Symbol = validateSymbol();
 
         System.out.print("Player 2 | Enter your name: ");
-        String p2Name = scanner.nextLine();
-        nameCheckTwoPlayerGame(p2Name);
+        String p2Name = validateName();
         char p2Symbol = (p1Symbol == 'X') ? 'O' : 'X';
         System.out.println("Player 2 | Your symbol is " + p2Symbol);
 
@@ -104,7 +101,6 @@ public class Main
 
         while (!gameOver) {
             displayBoard(board);
-
             System.out.print(currentPlayer + " (" + currentSymbol + "), enter row and column (1‑3, space separated): ");
             int[] move = getPlayerMove(board);
             int row = move[0];
@@ -140,8 +136,30 @@ public class Main
     }
 
 // -------------------------------------------------------------------------
-// Helper methods for TwoPlayer
+// Helper methods
 // -------------------------------------------------------------------------
+
+    // Validates and returns a name containing only letters
+    private static String validateName() {
+        while (true) {
+            String name = scanner.nextLine().trim();
+            if (name.matches("^[a-zA-Z]+$")) {
+                return name;
+            }
+            System.out.print(RED + "Invalid name. Use only letters. Try again: " + RESET);
+        }
+    }
+
+    // Returns a valid symbol: 'X' or 'O' (uppercase)
+    private static char validateSymbol() {
+        while (true) {
+            String input = scanner.nextLine().trim().toUpperCase();
+            if (input.equals("X") || input.equals("O")) {
+                return input.charAt(0);
+            }
+            System.out.print(RED + "Invalid symbol. Choose X or O: " + RESET);
+        }
+    }
 
     // Initialize the board with empty spaces
     private static void initBoard(char[][] board) {
@@ -221,125 +239,5 @@ public class Main
                     return false;
             }
         }
-        // If full and no winner, it's a draw
-        return true;
+        return true; // full board
     }
-
-    // Helper to get a valid symbol (X or O) from the user
-    private static char getSymbolInput() {
-        while (true) {
-            String input = scanner.nextLine().trim().toUpperCase();
-            if (input.equals("X") || input.equals("O")) {
-                return input.charAt(0);
-            }
-            System.out.print("Invalid symbol. Choose X or O: ");
-        }
-    }
-
-    // Existing name check function (unchanged, but we'll keep it)
-    public static void nameCheckTwoPlayerGame(String name) {
-        while (!name.matches("^[a-zA-Z]+$")) {
-            System.out.println(RED + "\nSorry, invalid input." + RESET);
-            System.out.print("Please enter your name: ");
-            name = scanner.nextLine();
-        }
-    }
-    public static String columnsRowsCheckTwoPlayerGame(String winner, boolean draw, String curPlayer, int[][] array)
-    {
-        while (true)
-        {
-
-            String[] data;
-            try
-            {
-
-                data = scanner.nextLine().split(",");
-
-                // Try to parse the columns and rows
-                int p2Column = Integer.parseInt(data[0].trim());
-                int p2Row = Integer.parseInt(data[1].trim());
-
-                // If the player has the symbol 'x', pass that symbol which uniquely identifies that player
-                // Otherwise, pass the symbol that uniquely identifies the second player
-                // Regardless, the array with the indicated column and row will be passed
-                if (Objects.equals(curPlayer, "x")){
-                    return tablePrintAndCheckResult("x", array[p2Column][p2Row]);
-                }else{
-                    return tablePrintAndCheckResult("o", array[p2Column][p2Row]);
-                }
-            } catch (Exception e)
-            {
-                System.out.println(RED + "\nSorry, invalid input" + RESET);
-                System.out.println("\nPlease, enter a valid input");
-                columnsRowsCheckTwoPlayerGame(winner, draw, curPlayer, array);
-            }
-
-        }
-    }
-
-    public static String tablePrintAndCheckResult(String symbol, int array)
-    {
-
-        String result = "";
-
-        // Print the table with the current placements of all the symbols
-        System.out.println(
-                BLUE + "   Table\n" + RESET +
-                "   |   " +    "|\n" +
-                "---" + "|---" + "|" + "---\n" +
-                "---" + "|---" + "|" + "---\n" +
-                "   |   " + "|"
-        );
-
-        // Check if the result is one of the players or a draw
-        if (Objects.equals(result, "Player 1"))
-        {
-            return result;
-        }else if (Objects.equals(result, "Player 2"))
-        {
-            return result;
-        }else if (result.equals("draw"))
-        {
-            return result;
-        }
-
-        return "Continuing";
-    }
-
-    public static void nameCheckTwoPlayerGame(String name)
-    {
-
-        // While the input does not contain only letters,
-        // Continue asking for the valid input
-        while (!name.matches("^[a-zA-Z]+$"))
-        {
-            System.out.println(RED + "\nSorry, invalid input." + RESET);
-            System.out.print("Please enter your name: ");
-            name = scanner.nextLine();
-        }
-
-    }
-
-    public static void symbolCheckTwoPlayerGame(String p1Symbol, String p2Symbol)
-    {
-
-        // While the symbols are the same,
-        // continue asking for the valid input
-        while (Objects.equals(p1Symbol, p2Symbol))
-        {
-            System.out.println(RED + "\nSorry, invalid input." + RESET);
-            System.out.print("Cannot be the same. enter your symbol: ");
-            p2Symbol = scanner.nextLine().toLowerCase();
-        }
-
-        // While symbols do not contain either 'x' or 'o',
-        // continue asking for the valid input
-        while (!Objects.equals(p1Symbol, "o")  && !Objects.equals(p1Symbol, "x") && !Objects.equals(p2Symbol, "o")  && !Objects.equals(p2Symbol, "x"))
-        {
-            System.out.println(RED + "\nSorry, invalid input." + RESET);
-            System.out.print("Please enter your symbol: ");
-            p2Symbol = scanner.nextLine().toLowerCase();
-        }
-
-    }
-}
