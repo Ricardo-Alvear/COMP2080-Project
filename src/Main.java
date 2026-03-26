@@ -19,7 +19,7 @@ public class Main
         // Ricardo Alvear | 101536306
         // Sayuni Wimaladharma | 101563313
         // Kartik Madarapu | 101564894
-        // Noela Bilonda Kabundi |
+        // Noela Bilonda Kabundi | 101485935
 
         System.out.println(BLUE + "Hello! Welcome To The TicTacToe Game" + RESET);
         System.out.print(GREEN + "Enter 1 for single player or 2 for two players: " + RESET);
@@ -50,15 +50,6 @@ public class Main
 
     public static void OnePlayer()
     {
-        // Sayuni will do this: 
-        // 2) If the user selects 1 player (versus Minimax AI) 
-        // a. The Human player should be asked their name 
-        // b. The player must be prompted to choose their symbol (‘X’ or O’) 
-        // c. The player with symbol ‘X’ should go first (computer or human player). 
-        // d. The present board state will be displayed and: 
-        // 1. If the computer is to play, it will now show the board updated with the 
-        // computer’s symbol. 
-        
           System.out.println(GREEN + "Starting the game!" + RESET);
 
           char[][] board = new char[3][3];
