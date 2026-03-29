@@ -360,6 +360,71 @@ public class Main
         return false;
     }
 
+    // Minimax AI implementation for optimal computer moves
+    public static int[] findBestMove(char[][] board, char computerSymbol, char playerSymbol) {
+        int bestScore = Integer.MIN_VALUE;
+        int[] bestMove = {-1, -1};
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == '-') {
+                    board[i][j] = computerSymbol;
+                    int score = minimax(board, 0, false, computerSymbol, playerSymbol);
+                    board[i][j] = '-';
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove[0] = i;
+                        bestMove[1] = j;
+                    }
+                }
+            }
+        }
+        
+        return bestMove;
+    }
+    
+    public static int minimax(char[][] board, int depth, boolean isMaximizing, char computerSymbol, char playerSymbol) {
+        // Check for terminal states
+        if (checkWin(board, computerSymbol)) {
+            return 10 - depth;
+        }
+        if (checkWin(board, playerSymbol)) {
+            return depth - 10;
+        }
+        if (isFull(board)) {
+            return 0;
+        }
+        
+        if (isMaximizing) {
+            int bestScore = Integer.MIN_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (board[i][j] == '-') {
+                        board[i][j] = computerSymbol;
+                        int score = minimax(board, depth + 1, false, computerSymbol, playerSymbol);
+                        board[i][j] = '-';
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+            }
+            return bestScore;
+        } else {
+            int bestScore = Integer.MAX_VALUE;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (board[i][j] == '-') {
+                        board[i][j] = playerSymbol;
+                        int score = minimax(board, depth + 1, true, computerSymbol, playerSymbol);
+                        board[i][j] = '-';
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+            }
+            return bestScore;
+        }
+    }
+
     public static boolean isFull(char[][] board)
     {
         for (int i = 0; i < 3; i++)
