@@ -352,12 +352,9 @@ public class Main
                 board[2][2] == symbol)
             return true;
 
-        if (board[0][2] == symbol &&
+        return board[0][2] == symbol &&
                 board[1][1] == symbol &&
-                board[2][0] == symbol)
-            return true;
-
-        return false;
+                board[2][0] == symbol;
     }
 
     // Minimax AI implementation for optimal computer moves
@@ -395,9 +392,10 @@ public class Main
         if (isFull(board)) {
             return 0;
         }
-        
+
+        int bestScore;
         if (isMaximizing) {
-            int bestScore = Integer.MIN_VALUE;
+            bestScore = Integer.MIN_VALUE;
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (board[i][j] == '-') {
@@ -408,9 +406,8 @@ public class Main
                     }
                 }
             }
-            return bestScore;
         } else {
-            int bestScore = Integer.MAX_VALUE;
+            bestScore = Integer.MAX_VALUE;
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (board[i][j] == '-') {
@@ -421,8 +418,8 @@ public class Main
                     }
                 }
             }
-            return bestScore;
         }
+        return bestScore;
     }
 
     public static boolean isFull(char[][] board)
